@@ -1,11 +1,12 @@
-# PIA NextGen Servers Port Forwarding + Transmission support - Unofficial
-New PIA pfSense (Private Internet Access) port forwarding API script for next gen servers. Tested on pfSense 2.4.5-RELEASE-p1 (amd64) and transmission-daemon 2.94. 
+## Original code by fm407 (https://github.com/fm407/PIA-NextGen-PortForwarding)
 
-# **Issue introduced in 2.5.1: Regression #11805 breaks port forwarding. Please use 2.5.2.**
+---
 
-# **Before starting make sure to have configured PIA on your pfSense according to this guide: https://blog.networkprofile.org/private-internet-access-vpn-on-pfsense/**
+## PIA OpenVPN Port Forwarding + Transmission support
+Tested on 2.5.2-RELEASE (amd64) and transmission-daemon 2.94. 
 
-For a list of nextgen servers supporting port forwarding: https://github.com/fm407/PIA-NextGen-PortForwarding/blob/master/nextgen-portforward-servers.txt 
+## Before starting make sure to have configured PIA on your pfSense according to this guide:
+https://blog.networkprofile.org/private-internet-access-vpn-on-pfsense/
 
 The scripts have variables that you must change in order for the script to work, make sure to read the scripts before running them.
 
@@ -13,7 +14,7 @@ Your pfSense needs the following packages: `xmlstarlet` `jq` (details in step I.
 
 Now you can follow this guide:
 
-# **I. pfSense side**
+## **I. pfSense side**
 
 **1.Enable SSH on pfSense**</br>
 System -> Advanced => tick "Enable Secure Shell"</br>
@@ -149,7 +150,7 @@ And paste the following: `piaportforwarding_enable="YES"`
 -(Optional) Disable SSH via WebUI under System -> Advanced => un-tick "Enable Secure Shell"</br>
 </br>
 
-# **II. Transmission host side**</br>
+## **II. Transmission host side**</br>
 -This part is for a Debian 10 host, your mileage may vary depending on the distro you use for your Transmission host.</br>
 -If there is something already configured on your side please read the steps anyway just to be sure there are no tiny difference.</br>
 
