@@ -2,6 +2,11 @@
 
 ---
 
+# UPDATE 4.6.2025
+For error `[PIA-API] Error! Failed to receive Signature!` see the [#2](https://github.com/Hakun1n/PIA-OVPN-pfSense-PortForward/issues/2) for solution
+
+---
+
 ## PIA OpenVPN Port Forwarding + Transmission support
 Tested on 2.5.2-RELEASE (amd64) and transmission-daemon 2.94. 
 
