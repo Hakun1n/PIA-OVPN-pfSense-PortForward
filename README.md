@@ -10,7 +10,7 @@ For error `[PIA-API] Error! Failed to receive Signature!` see the [#2](https://g
 ## PIA OpenVPN Port Forwarding + Transmission support
 Tested on 2.8.1-RELEASE (amd64) and transmission-daemon 2.94. 
 
-## Before starting make sure to have configured PIA on your pfSense according to this guide:
+### Before starting make sure to have configured PIA on your pfSense according to this guide:
 https://blog.networkprofile.org/private-internet-access-vpn-on-pfsense/
 
 The scripts have variables that you must change in order for the script to work, make sure to read the scripts before running them.
