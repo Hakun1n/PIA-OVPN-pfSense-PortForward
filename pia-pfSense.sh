@@ -12,12 +12,12 @@ export PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:/root/b
 ####### Adjust all of the following variables #######
 
 # PIA Credentials
-piauser='PIAuser'
-piapass='PIApassword'
+piauser='piauser'
+piapass='piapass'
 
 # Transmission RPC Credentials
-transuser='TransUser'
-transpass='TransPass'
+transuser='transuser'
+transpass='transpass'
 
 # OpenVPN interface name
 ovpniface='ovpnc1'
@@ -36,7 +36,7 @@ conffile='/cf/conf/config.xml'
 tmpconffile='/tmp/tmpconfig.xml'
 
 # Fetch remote Transmission IP from config
-transip=$(xml sel -t -v "//alias[name=\"$ipalias\"]/address" $conffile)
+transip=$(xmllint --xpath '//alias[name="'$ipalias'"]/address/text()' $conffile)
 
 ###### Nextgen PIA port forwarding #######
 # If your connection is unstable you might need to adjust these.
@@ -105,7 +105,7 @@ while true; do
     get_sig
     bind_port
   fi
-  
+
   # Some checks that we received valid port number and not some garbage.
   if [ -z "$pf_port" ]; then
     pf_port='0'
@@ -118,9 +118,9 @@ while true; do
     logger "[PIA] Fatal error! Value $pf_port outside allowed port range. PIA API has most probably changed. Manual check necessary."
     exit 1
   fi
-  
+
   # Get current NAT port number using xmlstarlet to parse the config file.
-  natport=$(xml sel -t -v "//alias[name=\"$portalias\"]/address" $conffile)
+  natport=$(xmllint --xpath '//alias[name="'$portalias'"]/address/text()' $conffile)
 
   # If the acquired port is the same as already configured do not pointlessly reload config.
   if [ "$natport" -eq "$pf_port" ]; then
@@ -132,20 +132,26 @@ while true; do
       logger "[PIA] Acquired port $pf_port equals the already configured port $natport - no action required. Silencing further messages."
       log_cycle=$((log_cycle+1))
     fi
-	else
+        else
     # If the port has changed update the tempconfig file and reset the log cycle.
     logger "[PIA] Acquired NEW forwarding port: $pf_port, current NAT rule port: $natport"
-    xml ed -u "//alias[name=\"$portalias\"]/address" -v $pf_port $conffile > $tmpconffile
+    cp $conffile $tmpconffile
+xmlxml=$(xmllint --shell $tmpconffile << EOF
+cd /pfsense/aliases/alias[name="$portalias"]/address
+set $pf_port
+save
+EOF
+)
     log_cycle=0
     reloadcfg=1
   fi
 
   # Validate the XML file just to ensure we don't nuke whole configuration
-  xml val -q $tmpconffile
+  xmlwf -s $tmpconffile
   xmlval=$?
   if [ "$xmlval" -gt 0 ]; then
-	 logger "[PIA] Fatal error! Updated tempconf file $tmpconffile does not have valid XML format. Verify that the port alias is correct in script header and exists in pfSense Alias list"
-	 exit 1
+         logger "[PIA] Fatal error! Updated tempconf file $tmpconffile does not have valid XML format. Verify that the port alias is correct in script header and exists in pfSense Alias list"
+         exit 1
   fi
 
   # If the updated tempconfig is valid and the port changed update and reload config
