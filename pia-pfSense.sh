@@ -1,10 +1,10 @@
 #!/bin/sh
 export PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:/root/bin
 
-# Vers: 1.2 beta
-# Date: 1/2/2026
-# Compatibility: pfSense 2.8.1>
-# Before starting setup PIA following this guide: https://blog.networkprofile.org/private-internet-access-vpn-on-pfsense/
+# Vers: 1.3
+# Date: 28.4.2026
+# Compatibility: pfSense 2.8.1
+# Prerequisites: Setup PIA via OpenVPN following this guide: https://blog.networkprofile.org/private-internet-access-vpn-on-pfsense/
 
 ####### Adjust all of the following variables #######
 
@@ -40,12 +40,9 @@ transip=$(xmllint --xpath '//alias[name="'$ipalias'"]/address/text()' $conffile)
 curl_max_time=15
 curl_retry=5
 curl_retry_delay=15
-
+	
 get_auth_token () {
-  tok=$(curl --interface ${ovpniface} --insecure --silent --show-error --request POST --max-time $curl_max_time \
-    --header "Content-Type: application/json" \
-    --data "{\"username\":\"$piauser\",\"password\":\"$piapass\"}" \
-    "https://www.privateinternetaccess.com/api/client/v2/token" | jq -r '.token')
+  tok=$(curl -s -u "$piauser:$piapass" --interface $ovpniface --insecure --silent --show-error --max-time 15 "https://privateinternetaccess.com/gtoken/generateToken" | jq -r '.token')
   tok_rc=$?
   if [ "$tok_rc" -ne 0 ]; then
     logger "[PIA-API] Error! Failed to acquire auth token!"
@@ -90,7 +87,9 @@ pf_bindinterval=$(( 15 * 60))
 pf_minreuse=$(( 60 * 60 * 24 * 7 ))
 
 pf_remaining=0
-vpn_ip=$(traceroute -i ${ovpniface} -m 1 privateinternetaccess.com | tail -n 1 | awk '{print $2}')
+# There is a regression bug in OpenVPN which wrongly assigns peer IP instead of GW. So we have to manually craft the correct GW IP.
+# pfSense redmine record: https://redmine.pfsense.org/issues/13278
+vpn_ip=$(ifconfig "$ovpniface" | awk '$1=="inet" { print $2 }' | sed 's/\.[0-9]*$/.1/')
 pf_host="$vpn_ip"
 log_cycle=0
 reloadcfg=0
