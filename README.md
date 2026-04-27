@@ -2,6 +2,19 @@
 
 ---
 
+# UPDATE 28.4.2026
+Fixed the script for pfSense 2.8.1</br>
+I strongly suggest to add Floating rule as a VPN Kill-Switch to prevent leaks over WAN GW. This is due to the OpenVPN bug. Rule example:</br>
+Action: Block</br>
+Quick: [x]</br>
+Interface: WAN</br>
+Direction: Out</br>
+Protocol: Any</br>
+Source: Address or Alias: <Your_PIA_Only_Alias></br>
+Destination: Any
+
+---
+
 # UPDATE 4.6.2025
 For error `[PIA-API] Error! Failed to receive Signature!` see the [#2](https://github.com/Hakun1n/PIA-OVPN-pfSense-PortForward/issues/2) for solution
 
